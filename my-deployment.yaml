@@ -1,0 +1,24 @@
+apiVersion: bigdata.kubernetesbigdataeg.org/v1alpha1
+kind: Nifi
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"bigdata.kubernetesbigdataeg.org/v1alpha1","kind":"Nifi","metadata":{"annotations":{},"name":"nifi-sample","namespace":"default"},"spec":{"size":3,"zookeeper":"default/zk"}}
+  creationTimestamp: "2023-03-02T11:15:30Z"
+  deletionGracePeriodSeconds: 0
+  deletionTimestamp: "2023-03-03T12:11:10Z"
+  finalizers: []
+  generation: 3
+  name: nifi-sample
+  namespace: nifi-operator-system
+  resourceVersion: "7286395"
+  uid: 692a1043-fc6f-486c-9b2a-a68ccf0976e9
+spec:
+  size: 3
+status:
+  conditions:
+  - lastTransitionTime: "2023-03-02T11:15:30Z"
+    message: Starting reconciliation
+    reason: Reconciling
+    status: Unknown
+    type: Available
