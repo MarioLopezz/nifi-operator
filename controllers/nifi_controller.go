@@ -19,10 +19,9 @@ package controllers
 import (
 	"context"
 	"fmt"
-	//"os"
+	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -214,173 +213,27 @@ func (r *NifiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	// - StateFulSet
 	//
 
-	// ConfigMap: Check if the ConfigMap already exists, if not create a new one
+	// Crea o actualiza ConfigMap
 	configMapFound := &corev1.ConfigMap{}
-	err = r.Get(ctx, types.NamespacedName{Name: "nifi-config", Namespace: nifi.Namespace}, configMapFound)
-	if err != nil && apierrors.IsNotFound(err) {
-		// Define the default ConfigMap
-		cm, err := r.defaultConfigMapForNifi(nifi)
-		if err != nil {
-			log.Error(err, "Failed to define new ConfigMap resource for Nifi")
-
-			// The following implementation will update the status
-			meta.SetStatusCondition(&nifi.Status.Conditions, metav1.Condition{Type: typeAvailableNifi,
-				Status: metav1.ConditionFalse, Reason: "Reconciling",
-				Message: fmt.Sprintf("Failed to create ConfigMap for the custom resource (%s): (%s)",
-					nifi.Name, err)})
-
-			if err := r.Status().Update(ctx, nifi); err != nil {
-				log.Error(err, "Failed to update Nifi status")
-				return ctrl.Result{}, err
-			}
-
-			return ctrl.Result{}, err
-		}
-
-		log.Info("Creating a new ConfigMap",
-			"ConfigMap.Namespace", cm.Namespace, "ConfigMap.Name", cm.Name)
-
-		if err = r.Create(ctx, cm); err != nil {
-			log.Error(err, "Failed to create new ConfigMap",
-				"ConfigMap.Namespace", cm.Namespace, "ConfigMap.Name", cm.Name)
-			return ctrl.Result{}, err
-		}
-
-		// ConfigMap created successfully at this point.
-		// We will requeue the reconciliation so that we can ensure the state
-		// and move forward for the next operations
-		//return ctrl.Result{RequeueAfter: time.Minute}, nil
-
-	} else if err != nil {
-		log.Error(err, "Failed to get ConfigMap")
-		// Let's return the error for the reconciliation be re-trigged again
+	if err := r.ensureResource(ctx, nifi, r.defaultConfigMapForNifi, configMapFound, "nifi-config", "ConfigMap"); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	// Service Headless: Check if the headless svc already exists, if not create a new one
+	// Headless Service
 	serviceHeadlessFound := &corev1.Service{}
-	err = r.Get(ctx, types.NamespacedName{Name: "nifi-hs", Namespace: nifi.Namespace}, serviceHeadlessFound)
-	if err != nil && apierrors.IsNotFound(err) {
-
-		hsvc, err := r.serviceHeadlessForNifi(nifi)
-		if err != nil {
-			log.Error(err, "Failed to define new Headless Service resource for Nifi")
-
-			// The following implementation will update the status
-			meta.SetStatusCondition(&nifi.Status.Conditions, metav1.Condition{Type: typeAvailableNifi,
-				Status: metav1.ConditionFalse, Reason: "Reconciling",
-				Message: fmt.Sprintf("Failed to create Headless Service for the custom resource (%s): (%s)",
-					nifi.Name, err)})
-
-			if err := r.Status().Update(ctx, nifi); err != nil {
-				log.Error(err, "Failed to update Nifi status")
-				return ctrl.Result{}, err
-			}
-
-			return ctrl.Result{}, err
-		}
-
-		log.Info("Creating a new Headless Service",
-			"Service.Namespace", hsvc.Namespace, "Service.Name", hsvc.Name)
-
-		if err = r.Create(ctx, hsvc); err != nil {
-			log.Error(err, "Failed to create new Headless Service",
-				"Service.Namespace", hsvc.Namespace, "Service.Name", hsvc.Name)
-			return ctrl.Result{}, err
-		}
-
-		// Service created successfully at this point.
-		// We will requeue the reconciliation so that we can ensure the state
-		// and move forward for the next operations
-		//return ctrl.Result{RequeueAfter: time.Minute}, nil
-
-	} else if err != nil {
-		log.Error(err, "Failed to get Headless Service")
-		// Let's return the error for the reconciliation be re-trigged again
+	if err := r.ensureResource(ctx, nifi, r.serviceHeadlessForNifi, serviceHeadlessFound, "nifi-hs", "Headless Service"); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	// Service: Check if the headless svc already exists, if not create a new one
+	// Service
 	serviceFound := &corev1.Service{}
-	err = r.Get(ctx, types.NamespacedName{Name: "nifi-svc", Namespace: nifi.Namespace}, serviceFound)
-	if err != nil && apierrors.IsNotFound(err) {
-
-		svc, err := r.serviceForNifi(nifi)
-		if err != nil {
-			log.Error(err, "Failed to define new Service resource for Nifi")
-
-			// The following implementation will update the status
-			meta.SetStatusCondition(&nifi.Status.Conditions, metav1.Condition{Type: typeAvailableNifi,
-				Status: metav1.ConditionFalse, Reason: "Reconciling",
-				Message: fmt.Sprintf("Failed to create Service for the custom resource (%s): (%s)",
-					nifi.Name, err)})
-
-			if err := r.Status().Update(ctx, nifi); err != nil {
-				log.Error(err, "Failed to update Nifi status")
-				return ctrl.Result{}, err
-			}
-
-			return ctrl.Result{}, err
-		}
-
-		log.Info("Creating a new Service",
-			"Service.Namespace", svc.Namespace, "Service.Name", svc.Name)
-
-		if err = r.Create(ctx, svc); err != nil {
-			log.Error(err, "Failed to create new Service",
-				"Service.Namespace", svc.Namespace, "Service.Name", svc.Name)
-			return ctrl.Result{}, err
-		}
-
-		// Service created successfully at this point.
-		// We will requeue the reconciliation so that we can ensure the state
-		// and move forward for the next operations
-		//return ctrl.Result{RequeueAfter: time.Minute}, nil
-
-	} else if err != nil {
-		log.Error(err, "Failed to get Headless Service")
-		// Let's return the error for the reconciliation be re-trigged again
+	if err := r.ensureResource(ctx, nifi, r.serviceForNifi, serviceFound, "nifi-svc", "Service"); err != nil {
 		return ctrl.Result{}, err
 	}
 
-	// StateFulSet: Check if the sts already exists, if not create a new one
+	// StatefulSet
 	found := &appsv1.StatefulSet{}
-	err = r.Get(ctx, types.NamespacedName{Name: nifi.Name, Namespace: nifi.Namespace}, found)
-	if err != nil && apierrors.IsNotFound(err) {
-		// Define a new sts
-		dep, err := r.stateFulSetForNifi(nifi)
-		if err != nil {
-			log.Error(err, "Failed to define new StateFulSet resource for Nifi")
-
-			// The following implementation will update the status
-			meta.SetStatusCondition(&nifi.Status.Conditions, metav1.Condition{Type: typeAvailableNifi,
-				Status: metav1.ConditionFalse, Reason: "Reconciling",
-				Message: fmt.Sprintf("Failed to create StatefulSet for the custom resource (%s): (%s)", nifi.Name, err)})
-
-			if err := r.Status().Update(ctx, nifi); err != nil {
-				log.Error(err, "Failed to update Nifi status")
-				return ctrl.Result{}, err
-			}
-
-			return ctrl.Result{}, err
-		}
-
-		log.Info("Creating a new StateFulSet",
-			"StatefulSet.Namespace", dep.Namespace, "StatefulSet.Name", dep.Name)
-
-		if err = r.Create(ctx, dep); err != nil {
-			log.Error(err, "Failed to create new StatefulSet",
-				"StatefulSet.Namespace", dep.Namespace, "StatefulSet.Name", dep.Name)
-			return ctrl.Result{}, err
-		}
-
-		// StatefulSet created successfully at this point.
-		// We will requeue the reconciliation so that we can ensure the state
-		// and move forward for the next operations
-		return ctrl.Result{RequeueAfter: time.Minute}, nil
-	} else if err != nil {
-		log.Error(err, "Failed to get StatefulSet")
-		// Let's return the error for the reconciliation be re-trigged again
+	if err := r.ensureResource(ctx, nifi, r.stateFulSetForNifi, found, nifi.Name, "StatefulSet"); err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -392,6 +245,10 @@ func (r *NifiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	// Therefore, the following code will ensure the Deployment size is the same as defined
 	// via the Size spec of the Custom Resource which we are reconciling.
 	size := nifi.Spec.Size
+	if found.Spec.Replicas == nil {
+		log.Error(nil, "Spec is not initialized for StatefulSet", "StatefulSet.Namespace", found.Namespace, "StatefulSet.Name", found.Name)
+		return ctrl.Result{}, fmt.Errorf("spec is not initialized for StatefulSet %s/%s", found.Namespace, found.Name)
+	}
 	if *found.Spec.Replicas != size {
 		found.Spec.Replicas = &size
 		if err = r.Update(ctx, found); err != nil {
@@ -462,11 +319,9 @@ func (r *NifiReconciler) doFinalizerOperationsForNifi(cr *bigdatav1alpha1.Nifi) 
 			cr.Namespace))
 }
 
-func (r *NifiReconciler) defaultConfigMapForNifi(
-	v *bigdatav1alpha1.Nifi) (*corev1.ConfigMap, error) {
-
-	namespace := v.Namespace
-	hostname := v.Name
+func (r *NifiReconciler) defaultConfigMapForNifi(Nifi *bigdatav1alpha1.Nifi) (client.Object, error) {
+	namespace := Nifi.Namespace
+	hostname := Nifi.Name
 
 	configMapData := make(map[string]string, 0)
 	nifiEnvPartial := `
@@ -698,8 +553,7 @@ func (r *NifiReconciler) defaultConfigMapForNifi(
 	zookeeperConnect := ``
 	for i := 0; i < 2; i++ {
 		literal := `export NIFI__nifiproperties__NIFI_ZOOKEEPER_CONNECT_STRING="` +
-			//strings.Split(zookeeper, "/")[1] + `-` +
-			`zk-` +
+			strings.Split(zookeeper, "/")[1] + `-` +
 			strconv.Itoa(i) + `.zk-hs.` +
 			strings.Split(zookeeper, "/")[0] +
 			`.svc.cluster.local:2181` + `"`
@@ -715,26 +569,25 @@ func (r *NifiReconciler) defaultConfigMapForNifi(
 	configMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "nifi-config",
-			Namespace: v.Namespace,
+			Namespace: Nifi.Namespace,
 		},
 		Data: configMapData,
 	}
 
-	if err := ctrl.SetControllerReference(v, configMap, r.Scheme); err != nil {
+	if err := ctrl.SetControllerReference(Nifi, configMap, r.Scheme); err != nil {
 		return nil, err
 	}
 
 	return configMap, nil
 }
 
-func (r *NifiReconciler) serviceHeadlessForNifi(
-	v *bigdatav1alpha1.Nifi) (*corev1.Service, error) {
+func (r *NifiReconciler) serviceHeadlessForNifi(Nifi *bigdatav1alpha1.Nifi) (client.Object, error) {
 
-	labels := labels(v, "nifi")
+	labels := labelsForNifi(Nifi.Name)
 	s := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "nifi-hs",
-			Namespace: v.Namespace,
+			Namespace: Nifi.Namespace,
 			Labels:    labels,
 		},
 		Spec: corev1.ServiceSpec{
@@ -758,21 +611,20 @@ func (r *NifiReconciler) serviceHeadlessForNifi(
 		},
 	}
 
-	if err := ctrl.SetControllerReference(v, s, r.Scheme); err != nil {
+	if err := ctrl.SetControllerReference(Nifi, s, r.Scheme); err != nil {
 		return nil, err
 	}
 
 	return s, nil
 }
 
-func (r *NifiReconciler) serviceForNifi(
-	v *bigdatav1alpha1.Nifi) (*corev1.Service, error) {
+func (r *NifiReconciler) serviceForNifi(Nifi *bigdatav1alpha1.Nifi) (client.Object, error) {
 
-	labels := labels(v, "nifi")
+	labels := labelsForNifi(Nifi.Name)
 	s := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "nifi-svc",
-			Namespace: v.Namespace,
+			Namespace: Nifi.Namespace,
 			Labels:    labels,
 		},
 		Spec: corev1.ServiceSpec{
@@ -786,7 +638,7 @@ func (r *NifiReconciler) serviceForNifi(
 		},
 	}
 
-	if err := ctrl.SetControllerReference(v, s, r.Scheme); err != nil {
+	if err := ctrl.SetControllerReference(Nifi, s, r.Scheme); err != nil {
 		return nil, err
 	}
 
@@ -794,11 +646,10 @@ func (r *NifiReconciler) serviceForNifi(
 }
 
 // stateFulSetForNifi returns a Nifi StateFulSet object
-func (r *NifiReconciler) stateFulSetForNifi(
-	nifi *bigdatav1alpha1.Nifi) (*appsv1.StatefulSet, error) {
+// func (r *NifiReconciler) stateFulSetForNifi(nifi *bigdatav1alpha1.Nifi) (*appsv1.StatefulSet, error) {
+func (r *NifiReconciler) stateFulSetForNifi(nifi *bigdatav1alpha1.Nifi) (client.Object, error) {
 
-	ls := labelsForNifi(nifi.Name)
-	labels := labels(nifi, "nifi")
+	labels := labelsForNifi(nifi.Name)
 
 	replicas := nifi.Spec.Size
 
@@ -819,7 +670,7 @@ func (r *NifiReconciler) stateFulSetForNifi(
 			ServiceName: "nifi-hs",
 			Replicas:    &replicas,
 			Selector: &metav1.LabelSelector{
-				MatchLabels: ls,
+				MatchLabels: labels,
 			},
 			UpdateStrategy: appsv1.StatefulSetUpdateStrategy{
 				Type:          "RollingUpdate",
@@ -827,7 +678,7 @@ func (r *NifiReconciler) stateFulSetForNifi(
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: ls,
+					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{{
@@ -993,7 +844,8 @@ func labelsForNifi(name string) map[string]string {
 	if err == nil {
 		imageTag = strings.Split(image, ":")[1]
 	}
-	return map[string]string{"app.kubernetes.io/name": "Nifi",
+	return map[string]string{
+		"app.kubernetes.io/name":       "Nifi",
 		"app.kubernetes.io/instance":   name,
 		"app.kubernetes.io/version":    imageTag,
 		"app.kubernetes.io/part-of":    "nifi-operator",
@@ -1005,21 +857,15 @@ func labelsForNifi(name string) map[string]string {
 // imageForNifi gets the Operand image which is managed by this controller
 // from the NIFI_IMAGE environment variable defined in the config/manager/manager.yaml
 func imageForNifi() (string, error) {
-	/*var imageEnvVar = "NIFI_IMAGE"
+	var imageEnvVar = "NIFI_IMAGE"
 	image, found := os.LookupEnv(imageEnvVar)
 	if !found {
 		return "", fmt.Errorf("Unable to find %s environment variable with the image", imageEnvVar)
 	}
-	*/
-	image := "kubernetesbigdataeg/nifi-alpine:1.16.1-1"
+
+	//image := "kubernetesbigdataeg/nifi-alpine:1.16.1-1"
 
 	return image, nil
-}
-
-func labels(v *bigdatav1alpha1.Nifi, l string) map[string]string {
-	return map[string]string{
-		"app": l,
-	}
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -1030,4 +876,47 @@ func (r *NifiReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&bigdatav1alpha1.Nifi{}).
 		Owns(&appsv1.Deployment{}).
 		Complete(r)
+}
+
+func (r *NifiReconciler) ensureResource(ctx context.Context, nifi *bigdatav1alpha1.Nifi, createResourceFunc func(*bigdatav1alpha1.Nifi) (client.Object, error), foundResource client.Object, resourceName string, resourceType string) error {
+	log := log.FromContext(ctx)
+	err := r.Get(ctx, types.NamespacedName{Name: resourceName, Namespace: nifi.Namespace}, foundResource)
+	if err != nil && apierrors.IsNotFound(err) {
+		resource, err := createResourceFunc(nifi)
+		if err != nil {
+			log.Error(err, fmt.Sprintf("Failed to define new %s resource for Nifi", resourceType))
+
+			// The following implementation will update the status
+			meta.SetStatusCondition(&nifi.Status.Conditions, metav1.Condition{Type: typeAvailableNifi,
+				Status: metav1.ConditionFalse, Reason: "Reconciling",
+				Message: fmt.Sprintf("Failed to create %s for the custom resource (%s): (%s)", resourceType, nifi.Name, err)})
+
+			if err := r.Status().Update(ctx, nifi); err != nil {
+				log.Error(err, "Failed to update Nifi status")
+				return err
+			}
+
+			return err
+		}
+
+		log.Info(fmt.Sprintf("Creating a new %s", resourceType),
+			fmt.Sprintf("%s.Namespace", resourceType), resource.GetNamespace(), fmt.Sprintf("%s.Name", resourceType), resource.GetName())
+
+		if err = r.Create(ctx, resource); err != nil {
+			log.Error(err, fmt.Sprintf("Failed to create new %s", resourceType),
+				fmt.Sprintf("%s.Namespace", resourceType), resource.GetNamespace(), fmt.Sprintf("%s.Name", resourceType), resource.GetName())
+			return err
+		}
+
+		if err := r.Get(ctx, types.NamespacedName{Name: resourceName, Namespace: nifi.Namespace}, foundResource); err != nil {
+			log.Error(err, fmt.Sprintf("Failed to get newly created %s", resourceType))
+			return err
+		}
+
+	} else if err != nil {
+		log.Error(err, fmt.Sprintf("Failed to get %s", resourceType))
+		return err
+	}
+
+	return nil
 }
