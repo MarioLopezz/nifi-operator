@@ -325,210 +325,208 @@ func (r *NifiReconciler) defaultConfigMapForNifi(Nifi *bigdatav1alpha1.Nifi) (cl
 
 	configMapData := make(map[string]string, 0)
 	nifiEnvPartial := `
-    export NIFI__nifiproperties__SINGLE_USER_CREDENTIALS_USERNAME="admin"
-    export NIFI__nifiproperties__SINGLE_USER_CREDENTIALS_PASSWORD="admin123456789"
-    export NIFI__nifiproperties__NIFI_SENSITIVE_PROPS_KEY="randomstring12charsmin"
-    export NIFI__nifiproperties__NIFI_WEB_HTTP_PORT="8080"
-    export NIFI__nifiproperties__NIFI_CLUSTER_IS_NODE="true"
-    export NIFI__nifiproperties__NIFI_CLUSTER_NODE_PROTOCOL_PORT="8082"
-    export NIFI__nifiproperties__NIFI_CLUSTER_NODE_PROTOCOL_MAX_THREADS="20"
-    export NIFI__nifiproperties__NIFI_ANALYTICS_PREDICT_ENABLED="true"
-    export NIFI__nifiproperties__NIFI_ELECTION_MAX_CANDIDATES="1"
-    export NIFI__nifiproperties__IS_CLUSTER_NODE="yes"
-    export NIFI__nifiproperties__ZK_MONITOR_PORT="2888"
-    export NIFI__nifiproperties__NIFI_ELECTION_MAX_WAIT="20 sec"
-    export NIFI__nifiproperties__NIFI_JVM_HEAP_INIT="3g"
-    export NIFI__nifiproperties__NIFI_JVM_HEAP_MAX="4g"
-    export NIFI__nifiproperties__NIFI_FLOW_CONFIGURATION_FILE="./conf/flow.xml.gz"
-    export NIFI__nifiproperties__NIFI_FLOW_CONFIGURATION_JSON_FILE="./conf/flow.json.gz"
-    export NIFI__nifiproperties__NIFI_FLOW_CONFIGURATION_ARCHIVE_ENABLED="true"
-    export NIFI__nifiproperties__NIFI_FLOW_CONFIGURATION_ARCHIVE_DIR="./conf/archive/"
-    export NIFI__nifiproperties__NIFI_FLOW_CONFIGURATION_ARCHIVE_MAX_TIME="30 days"
-    export NIFI__nifiproperties__NIFI_FLOW_CONFIGURATION_ARCHIVE_MAX_STORAGE="500 MB"
-    export NIFI__nifiproperties__NIFI_FLOW_CONFIGURATION_ARCHIVE_MAX_COUNT=""
-    export NIFI__nifiproperties__NIFI_FLOWCONTROLLER_AUTORESUMESTATE="true"
-    export NIFI__nifiproperties__NIFI_FLOWCONTROLLER_GRACEFUL_SHUTDOWN_PERIOD="10 sec"
-    export NIFI__nifiproperties__NIFI_FLOWSERVICE_WRITEDELAY_INTERVAL="500 ms"
-    export NIFI__nifiproperties__NIFI_ADMINISTRATIVE_YIELD_DURATION="30 sec"
-    export NIFI__nifiproperties__NIFI_BORED_YIELD_DURATION="10 millis"
-    export NIFI__nifiproperties__NIFI_QUEUE_BACKPRESSURE_COUNT="10000"
-    export NIFI__nifiproperties__NIFI_QUEUE_BACKPRESSURE_SIZE="1 GB"
-    export NIFI__nifiproperties__NIFI_AUTHORIZER_CONFIGURATION_FILE="./conf/authorizers.xml"
-    export NIFI__nifiproperties__NIFI_LOGIN_IDENTITY_PROVIDER_CONFIGURATION_FILE="./conf/login-identity-providers.xml"
-    export NIFI__nifiproperties__NIFI_TEMPLATES_DIRECTORY="./conf/templates"
-    export NIFI__nifiproperties__NIFI_UI_BANNER_TEXT=""
-    export NIFI__nifiproperties__NIFI_UI_AUTOREFRESH_INTERVAL="30 sec"
-    export NIFI__nifiproperties__NIFI_NAR_LIBRARY_DIRECTORY="./lib"
-    export NIFI__nifiproperties__NIFI_NAR_LIBRARY_AUTOLOAD_DIRECTORY="./extensions"
-    export NIFI__nifiproperties__NIFI_NAR_WORKING_DIRECTORY="./work/nar/"
-    export NIFI__nifiproperties__NIFI_DOCUMENTATION_WORKING_DIRECTORY="./work/docs/components"
-    export NIFI__nifiproperties__NIFI_STATE_MANAGEMENT_CONFIGURATION_FILE="./conf/state-management.xml"
-    export NIFI__nifiproperties__NIFI_STATE_MANAGEMENT_PROVIDER_LOCAL="local-provider"
-    export NIFI__nifiproperties__NIFI_STATE_MANAGEMENT_PROVIDER_CLUSTER="zk-provider"
-    export NIFI__nifiproperties__NIFI_STATE_MANAGEMENT_EMBEDDED_ZOOKEEPER_START="false"
-    export NIFI__nifiproperties__NIFI_STATE_MANAGEMENT_EMBEDDED_ZOOKEEPER_PROPERTIES="./conf/zookeeper.properties"
-    export NIFI__nifiproperties__NIFI_DATABASE_DIRECTORY="./database_repository"
-    export NIFI__nifiproperties__NIFI_H2_URL_APPEND=";LOCK_TIMEOUT=25000;WRITE_DELAY=0;AUTO_SERVER=FALSE"
-    export NIFI__nifiproperties__NIFI_REPOSITORY_ENCRYPTION_PROTOCOL_VERSION=""
-    export NIFI__nifiproperties__NIFI_REPOSITORY_ENCRYPTION_KEY_ID=""
-    export NIFI__nifiproperties__NIFI_REPOSITORY_ENCRYPTION_KEY_PROVIDER=""
-    export NIFI__nifiproperties__NIFI_REPOSITORY_ENCRYPTION_KEY_PROVIDER_KEYSTORE_LOCATION=""
-    export NIFI__nifiproperties__NIFI_REPOSITORY_ENCRYPTION_KEY_PROVIDER_KEYSTORE_PASSWORD=""
-    export NIFI__nifiproperties__NIFI_FLOWFILE_REPOSITORY_IMPLEMENTATION="org.apache.nifi.controller.repository.WriteAheadFlowFileRepository"
-    export NIFI__nifiproperties__NIFI_FLOWFILE_REPOSITORY_WAL_IMPLEMENTATION="org.apache.nifi.wali.SequentialAccessWriteAheadLog"
-    export NIFI__nifiproperties__NIFI_FLOWFILE_REPOSITORY_DIRECTORY="./flowfile_repository"
-    export NIFI__nifiproperties__NIFI_FLOWFILE_REPOSITORY_CHECKPOINT_INTERVAL="20 secs"
-    export NIFI__nifiproperties__NIFI_FLOWFILE_REPOSITORY_ALWAYS_SYNC="false"
-    export NIFI__nifiproperties__NIFI_FLOWFILE_REPOSITORY_RETAIN_ORPHANED_FLOWFILES="true"
-    export NIFI__nifiproperties__NIFI_SWAP_MANAGER_IMPLEMENTATION="org.apache.nifi.controller.FileSystemSwapManager"
-    export NIFI__nifiproperties__NIFI_QUEUE_SWAP_THRESHOLD="20000"
-    export NIFI__nifiproperties__NIFI_CONTENT_REPOSITORY_IMPLEMENTATION="org.apache.nifi.controller.repository.FileSystemRepository"
-    export NIFI__nifiproperties__NIFI_CONTENT_CLAIM_MAX_APPENDABLE_SIZE="50 KB"
-    export NIFI__nifiproperties__NIFI_CONTENT_REPOSITORY_DIRECTORY_DEFAULT="./content_repository"
-    export NIFI__nifiproperties__NIFI_CONTENT_REPOSITORY_ARCHIVE_MAX_RETENTION_PERIOD="7 days"
-    export NIFI__nifiproperties__NIFI_CONTENT_REPOSITORY_ARCHIVE_MAX_USAGE_PERCENTAGE="50%"
-    export NIFI__nifiproperties__NIFI_CONTENT_REPOSITORY_ARCHIVE_ENABLED="true"
-    export NIFI__nifiproperties__NIFI_CONTENT_REPOSITORY_ALWAYS_SYNC="false"
-    export NIFI__nifiproperties__NIFI_CONTENT_VIEWER_URL="../nifi-content-viewer/"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_IMPLEMENTATION="org.apache.nifi.provenance.WriteAheadProvenanceRepository"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_DIRECTORY_DEFAULT="./provenance_repository"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_MAX_STORAGE_TIME="30 days"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_MAX_STORAGE_SIZE="10 GB"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_ROLLOVER_TIME="10 mins"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_ROLLOVER_SIZE="100 MB"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_QUERY_THREADS="2"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_INDEX_THREADS="2"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_COMPRESS_ON_ROLLOVER="true"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_ALWAYS_SYNC="falsenifi_provenance_repository_indexed_fields=EventType, FlowFileUUID, Filename, ProcessorID, Relationship"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_INDEXED_ATTRIBUTES=""
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_INDEX_SHARD_SIZE="500 MB"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_MAX_ATTRIBUTE_LENGTH="65536"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_CONCURRENT_MERGE_THREADS="2"
-    export NIFI__nifiproperties__NIFI_PROVENANCE_REPOSITORY_BUFFER_SIZE="100000"
-    export NIFI__nifiproperties__NIFI_COMPONENTS_STATUS_REPOSITORY_IMPLEMENTATION="org.apache.nifi.controller.status.history.VolatileComponentStatusRepository"
-    export NIFI__nifiproperties__NIFI_COMPONENTS_STATUS_REPOSITORY_BUFFER_SIZE="1440"
-    export NIFI__nifiproperties__NIFI_COMPONENTS_STATUS_SNAPSHOT_FREQUENCY="1 min"
-    export NIFI__nifiproperties__NIFI_STATUS_REPOSITORY_QUESTDB_PERSIST_NODE_DAYS="14"
-    export NIFI__nifiproperties__NIFI_STATUS_REPOSITORY_QUESTDB_PERSIST_COMPONENT_DAYS="3"
-    export NIFI__nifiproperties__NIFI_STATUS_REPOSITORY_QUESTDB_PERSIST_LOCATION="./status_repository"
-    export NIFI__nifiproperties__NIFI_REMOTE_INPUT_HOST="nifi-0"
-    export NIFI__nifiproperties__NIFI_REMOTE_INPUT_SECURE="false"
-    export NIFI__nifiproperties__NIFI_REMOTE_INPUT_SOCKET_PORT="10000"
-    export NIFI__nifiproperties__NIFI_REMOTE_INPUT_HTTP_ENABLED="true"
-    export NIFI__nifiproperties__NIFI_REMOTE_INPUT_HTTP_TRANSACTION_TTL="30 sec"
-    export NIFI__nifiproperties__NIFI_REMOTE_CONTENTS_CACHE_EXPIRATION="30 secs"
-    export NIFI__nifiproperties__NIFI_WEB_HTTP_NETWORK_INTERFACE_DEFAULT=""
-    export NIFI__nifiproperties__NIFI_WEB_HTTPS_HOST=""
-    export NIFI__nifiproperties__NIFI_WEB_HTTPS_PORT=""
-    export NIFI__nifiproperties__NIFI_WEB_HTTPS_NETWORK_INTERFACE_DEFAULT=""
-    export NIFI__nifiproperties__NIFI_WEB_JETTY_WORKING_DIRECTORY="./work/jetty"
-    export NIFI__nifiproperties__NIFI_WEB_JETTY_THREADS="200"
-    export NIFI__nifiproperties__NIFI_WEB_MAX_HEADER_SIZE="16 KB"
-    export NIFI__nifiproperties__NIFI_WEB_PROXY_CONTEXT_PATH=""
-    export NIFI__nifiproperties__NIFI_WEB_PROXY_HOST=""
-    export NIFI__nifiproperties__NIFI_WEB_MAX_CONTENT_SIZE=""
-    export NIFI__nifiproperties__NIFI_WEB_MAX_REQUESTS_PER_SECOND="30000"
-    export NIFI__nifiproperties__NIFI_WEB_MAX_ACCESS_TOKEN_REQUESTS_PER_SECOND="25"
-    export NIFI__nifiproperties__NIFI_WEB_REQUEST_TIMEOUT="60 secs"
-    export NIFI__nifiproperties__NIFI_WEB_REQUEST_IP_WHITELIST=""
-    export NIFI__nifiproperties__NIFI_WEB_SHOULD_SEND_SERVER_VERSION="true"
-    export NIFI__nifiproperties__NIFI_WEB_REQUEST_LOG_FORMAT="""%{client}a - %u %t "%r" %s %O "%{Referer}i" "%{User-Agent}i""""
-    export NIFI__nifiproperties__NIFI_WEB_HTTPS_CIPHERSUITES_INCLUDE=""
-    export NIFI__nifiproperties__NIFI_WEB_HTTPS_CIPHERSUITES_EXCLUDE=""
-    export NIFI__nifiproperties__NIFI_SENSITIVE_PROPS_KEY_PROTECTED=""
-    export NIFI__nifiproperties__NIFI_SENSITIVE_PROPS_ALGORITHM="NIFI_PBKDF2_AES_GCM_256"
-    export NIFI__nifiproperties__NIFI_SENSITIVE_PROPS_ADDITIONAL_KEYS=""
-    export NIFI__nifiproperties__NIFI_SECURITY_AUTORELOAD_ENABLED="false"
-    export NIFI__nifiproperties__NIFI_SECURITY_AUTORELOAD_INTERVAL="10 secs"
-    export NIFI__nifiproperties__NIFI_SECURITY_KEYSTORE=""
-    export NIFI__nifiproperties__NIFI_SECURITY_KEYSTORETYPE=""
-    export NIFI__nifiproperties__NIFI_SECURITY_KEYSTOREPASSWD=""
-    export NIFI__nifiproperties__NIFI_SECURITY_KEYPASSWD=""
-    export NIFI__nifiproperties__NIFI_SECURITY_TRUSTSTORE=""
-    export NIFI__nifiproperties__NIFI_SECURITY_TRUSTSTORETYPE=""
-    export NIFI__nifiproperties__NIFI_SECURITY_TRUSTSTOREPASSWD=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_AUTHORIZER="single-user-authorizer"
-    export NIFI__nifiproperties__NIFI_SECURITY_ALLOW_ANONYMOUS_AUTHENTICATION="false"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_LOGIN_IDENTITY_PROVIDER=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_JWS_KEY_ROTATION_PERIOD="PT1H"
-    export NIFI__nifiproperties__NIFI_SECURITY_OCSP_RESPONDER_URL=""
-    export NIFI__nifiproperties__NIFI_SECURITY_OCSP_RESPONDER_CERTIFICATE=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_DISCOVERY_URL=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_CONNECT_TIMEOUT="5 secs"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_READ_TIMEOUT="5 secs"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_CLIENT_ID=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_CLIENT_SECRET=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_PREFERRED_JWSALGORITHM=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_ADDITIONAL_SCOPES=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_CLAIM_IDENTIFYING_USER=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_FALLBACK_CLAIMS_IDENTIFYING_USER=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_OIDC_TRUSTSTORE_STRATEGY="JDK"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_KNOX_URL=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_KNOX_PUBLICKEY=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_KNOX_COOKIENAME="hadoop-jwt"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_KNOX_AUDIENCES=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_IDP_METADATA_URL=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_SP_ENTITY_ID=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_IDENTITY_ATTRIBUTE_NAME=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_GROUP_ATTRIBUTE_NAME=""
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_METADATA_SIGNING_ENABLED="false"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_REQUEST_SIGNING_ENABLED="false"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_SIGNATURE_ALGORITHM="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_SIGNATURE_DIGEST_ALGORITHM="http://www.w3.org/2001/04/xmlenc#sha256"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_MESSAGE_LOGGING_ENABLED="false"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_AUTHENTICATION_EXPIRATION="12 hours"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_SINGLE_LOGOUT_ENABLED="false"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_HTTP_CLIENT_TRUSTSTORE_STRATEGY="JDK"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_HTTP_CLIENT_CONNECT_TIMEOUT="30 secs"
-    export NIFI__nifiproperties__NIFI_SECURITY_USER_SAML_HTTP_CLIENT_READ_TIMEOUT="30 secs"
-    export NIFI__nifiproperties__NIFI_LISTENER_BOOTSTRAP_PORT="0"
-    export NIFI__nifiproperties__NIFI_CLUSTER_PROTOCOL_HEARTBEAT_INTERVAL="5 sec"
-    export NIFI__nifiproperties__NIFI_CLUSTER_PROTOCOL_HEARTBEAT_MISSABLE_MAX="8"
-    export NIFI__nifiproperties__NIFI_CLUSTER_PROTOCOL_IS_SECURE="false"
-    export NIFI__nifiproperties__NIFI_CLUSTER_NODE_ADDRESS="nifi-0.nifi-hs.default.svc.cluster.local"
-    export NIFI__nifiproperties__NIFI_CLUSTER_NODE_EVENT_HISTORY_SIZE="25"
-    export NIFI__nifiproperties__NIFI_CLUSTER_NODE_CONNECTION_TIMEOUT="5 sec"
-    export NIFI__nifiproperties__NIFI_CLUSTER_NODE_READ_TIMEOUT="5 sec"
-    export NIFI__nifiproperties__NIFI_CLUSTER_NODE_MAX_CONCURRENT_REQUESTS="100"
-    export NIFI__nifiproperties__NIFI_CLUSTER_FIREWALL_FILE=""
-    export NIFI__nifiproperties__NIFI_CLUSTER_FLOW_ELECTION_MAX_WAIT_TIME="20 sec"
-    export NIFI__nifiproperties__NIFI_CLUSTER_FLOW_ELECTION_MAX_CANDIDATES="1"
-    export NIFI__nifiproperties__NIFI_CLUSTER_LOAD_BALANCE_HOST=""
-    export NIFI__nifiproperties__NIFI_CLUSTER_LOAD_BALANCE_PORT="6342"
-    export NIFI__nifiproperties__NIFI_CLUSTER_LOAD_BALANCE_CONNECTIONS_PER_NODE="1"
-    export NIFI__nifiproperties__NIFI_CLUSTER_LOAD_BALANCE_MAX_THREAD_COUNT="8"
-    export NIFI__nifiproperties__NIFI_CLUSTER_LOAD_BALANCE_COMMS_TIMEOUT="30 sec"
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_CONNECT_TIMEOUT="10 secs"
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_SESSION_TIMEOUT="10 secs"
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_ROOT_NODE="/nifi"
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_CLIENT_SECURE="false"
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_SECURITY_KEYSTORE=""
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_SECURITY_KEYSTORETYPE=""
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_SECURITY_KEYSTOREPASSWD=""
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_SECURITY_TRUSTSTORE=""
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_SECURITY_TRUSTSTORETYPE=""
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_SECURITY_TRUSTSTOREPASSWD=""
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_JUTE_MAXBUFFER=""
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_AUTH_TYPE=""
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_KERBEROS_REMOVEHOSTFROMPRINCIPAL=""
-    export NIFI__nifiproperties__NIFI_ZOOKEEPER_KERBEROS_REMOVEREALMFROMPRINCIPAL=""
-    export NIFI__nifiproperties__NIFI_KERBEROS_KRB5_FILE=""
-    export NIFI__nifiproperties__NIFI_KERBEROS_SERVICE_PRINCIPAL=""
-    export NIFI__nifiproperties__NIFI_KERBEROS_SERVICE_KEYTAB_LOCATION=""
-    export NIFI__nifiproperties__NIFI_KERBEROS_SPNEGO_PRINCIPAL=""
-    export NIFI__nifiproperties__NIFI_KERBEROS_SPNEGO_KEYTAB_LOCATION=""
-    export NIFI__nifiproperties__NIFI_KERBEROS_SPNEGO_AUTHENTICATION_EXPIRATION="12 hours"
-    export NIFI__nifiproperties__NIFI_VARIABLE_REGISTRY_PROPERTIES=""
-    export NIFI__nifiproperties__NIFI_ANALYTICS_PREDICT_INTERVAL="3 mins"
-    export NIFI__nifiproperties__NIFI_ANALYTICS_QUERY_INTERVAL="5 mins"
-    export NIFI__nifiproperties__NIFI_ANALYTICS_CONNECTION_MODEL_IMPLEMENTATION="org.apache.nifi.controller.status.analytics.models.OrdinaryLeastSquares"
-    export NIFI__nifiproperties__NIFI_ANALYTICS_CONNECTION_MODEL_SCORE_NAME="rSquared"
-    export NIFI__nifiproperties__NIFI_ANALYTICS_CONNECTION_MODEL_SCORE_THRESHOLD=".90"
-    export NIFI__nifiproperties__NIFI_MONITOR_LONG_RUNNING_TASK_SCHEDULE=""
-    export NIFI__nifiproperties__NIFI_MONITOR_LONG_RUNNING_TASK_THRESHOLD=""
-    export NIFI__nifiproperties__NIFI_DIAGNOSTICS_ON_SHUTDOWN_ENABLED="false"
-    export NIFI__nifiproperties__NIFI_DIAGNOSTICS_ON_SHUTDOWN_VERBOSE="false"
-    export NIFI__nifiproperties__NIFI_DIAGNOSTICS_ON_SHUTDOWN_DIRECTORY="_/diagnosticsnifi_diagnostics_on_shutdown_max_filecount=10nifi_diagnostics_on_shutdown_max_directory_size=10 MB"
+	export NIFI__nifiproperties__nifi_sensitive_props_key="randomstring12charsmin"
+    export NIFI__nifiproperties__nifi_web_http_host="${HOSTNAME}.nifi-hs.default.svc.cluster.local"
+    export NIFI__nifiproperties__nifi_web_http_port="8080"
+    export NIFI__nifiproperties__nifi_cluster_is_node="true"
+    export NIFI__nifiproperties__nifi_analytics_predict_enabled="true"
+    export NIFI__nifiproperties__nifi_zookeeper_connect_string="zk-0.zk-hs.default.svc.cluster.local:2181,zk-1.zk-hs.default.svc.cluster.local:2181,zk-2.zk-hs.default.svc.cluster.local:2181"
+    export NIFI__nifiproperties__nifi_flow_configuration_file="./conf/flow.xml.gz"
+    export NIFI__nifiproperties__nifi_flow_configuration_json_file="./conf/flow.json.gz"
+    export NIFI__nifiproperties__nifi_flow_configuration_archive_enabled="true"
+    export NIFI__nifiproperties__nifi_flow_configuration_archive_dir="./conf/archive/"
+    export NIFI__nifiproperties__nifi_flow_configuration_archive_max_time="30 days"
+    export NIFI__nifiproperties__nifi_flow_configuration_archive_max_storage="500 mb"
+    export NIFI__nifiproperties__nifi_flow_configuration_archive_max_count=""
+    export NIFI__nifiproperties__nifi_flowcontroller_autoresumestate="true"
+    export NIFI__nifiproperties__nifi_flowcontroller_graceful_shutdown_period="10 sec"
+    export NIFI__nifiproperties__nifi_flowservice_writedelay_interval="500 ms"
+    export NIFI__nifiproperties__nifi_administrative_yield_duration="30 sec"
+    export NIFI__nifiproperties__nifi_bored_yield_duration="10 millis"
+    export NIFI__nifiproperties__nifi_queue_backpressure_count="10000"
+    export NIFI__nifiproperties__nifi_queue_backpressure_size="1 GB"
+    export NIFI__nifiproperties__nifi_authorizer_configuration_file="./conf/authorizers.xml"
+    export NIFI__nifiproperties__nifi_login_identity_provider_configuration_file="./conf/login-identity-providers.xml"
+    export NIFI__nifiproperties__nifi_templates_directory="./conf/templates"
+    export NIFI__nifiproperties__nifi_ui_banner_text=""
+    export NIFI__nifiproperties__nifi_ui_autorefresh_interval="30 sec"
+    export NIFI__nifiproperties__nifi_nar_library_directory="./lib"
+    export NIFI__nifiproperties__nifi_nar_library_autoload_directory="./extensions"
+    export NIFI__nifiproperties__nifi_nar_working_directory="./work/nar/"
+    export NIFI__nifiproperties__nifi_documentation_working_directory="./work/docs/components"
+    export NIFI__nifiproperties__nifi_state_management_configuration_file="./conf/state-management.xml"
+    export NIFI__nifiproperties__nifi_state_management_provider_local="local-provider"
+    export NIFI__nifiproperties__nifi_state_management_provider_cluster="zk-provider"
+    export NIFI__nifiproperties__nifi_state_management_embedded_zookeeper_start="false"
+    export NIFI__nifiproperties__nifi_state_management_embedded_zookeeper_properties="./conf/zookeeper.properties"
+    export NIFI__nifiproperties__nifi_database_directory="./database_repository"
+    export NIFI__nifiproperties__nifi_h2_url_append=";LOCK_TIMEOUT=25000;WRITE_DELAY=0;AUTO_SERVER=FALSE"
+    export NIFI__nifiproperties__nifi_repository_encryption_protocol_version=""
+    export NIFI__nifiproperties__nifi_repository_encryption_key_id=""
+    export NIFI__nifiproperties__nifi_repository_encryption_key_provider=""
+    export NIFI__nifiproperties__nifi_repository_encryption_key_provider_keystore_location=""
+    export NIFI__nifiproperties__nifi_repository_encryption_key_provider_keystore_password=""
+    export NIFI__nifiproperties__nifi_flowfile_repository_implementation="org.apache.nifi.controller.repository.WriteAheadFlowFileRepository"
+    export NIFI__nifiproperties__nifi_flowfile_repository_wal_implementation="org.apache.nifi.wali.SequentialAccessWriteAheadLog"
+    export NIFI__nifiproperties__nifi_flowfile_repository_directory="./flowfile_repository"
+    export NIFI__nifiproperties__nifi_flowfile_repository_checkpoint_interval="20 secs"
+    export NIFI__nifiproperties__nifi_flowfile_repository_always_sync="false"
+    export NIFI__nifiproperties__nifi_flowfile_repository_retain_orphaned_flowfiles="true"
+    export NIFI__nifiproperties__nifi_swap_manager_implementation="org.apache.nifi.controller.FileSystemSwapManager"
+    export NIFI__nifiproperties__nifi_queue_swap_threshold="20000"
+    export NIFI__nifiproperties__nifi_content_repository_implementation="org.apache.nifi.controller.repository.FileSystemRepository"
+    export NIFI__nifiproperties__nifi_content_claim_max_appendable_size="50 KB"
+    export NIFI__nifiproperties__nifi_content_repository_directory_default="./content_repository"
+    export NIFI__nifiproperties__nifi_content_repository_archive_max_retention_period="7 days"
+    export NIFI__nifiproperties__nifi_content_repository_archive_max_usage_percentage="50%"
+    export NIFI__nifiproperties__nifi_content_repository_archive_enabled="true"
+    export NIFI__nifiproperties__nifi_content_repository_always_sync="false"
+    export NIFI__nifiproperties__nifi_content_viewer_url="../nifi-content-viewer/"
+    export NIFI__nifiproperties__nifi_provenance_repository_implementation="org.apache.nifi.provenance.WriteAheadProvenanceRepository"
+    export NIFI__nifiproperties__nifi_provenance_repository_directory_default="./provenance_repository"
+    export NIFI__nifiproperties__nifi_provenance_repository_max_storage_time="30 days"
+    export NIFI__nifiproperties__nifi_provenance_repository_max_storage_size="10 GB"
+    export NIFI__nifiproperties__nifi_provenance_repository_rollover_time="10 mins"
+    export NIFI__nifiproperties__nifi_provenance_repository_rollover_size="100 MB"
+    export NIFI__nifiproperties__nifi_provenance_repository_query_threads="2"
+    export NIFI__nifiproperties__nifi_provenance_repository_index_threads="2"
+    export NIFI__nifiproperties__nifi_provenance_repository_compress_on_rollover="true"
+    export NIFI__nifiproperties__nifi_provenance_repository_always_sync="false"
+    export NIFI__nifiproperties__nifi_provenance_repository_indexed_fields="EventType, FlowFileUUID, Filename, ProcessorID, Relationship"
+    export NIFI__nifiproperties__nifi_provenance_repository_indexed_attributes=""
+    export NIFI__nifiproperties__nifi_provenance_repository_index_shard_size="500 MB"
+    export NIFI__nifiproperties__nifi_provenance_repository_max_attribute_length="65536"
+    export NIFI__nifiproperties__nifi_provenance_repository_concurrent_merge_threads="2"
+    export NIFI__nifiproperties__nifi_provenance_repository_buffer_size="100000"
+    export NIFI__nifiproperties__nifi_components_status_repository_implementation="org.apache.nifi.controller.status.history.VolatileComponentStatusRepository"
+    export NIFI__nifiproperties__nifi_components_status_repository_buffer_size="1440"
+    export NIFI__nifiproperties__nifi_components_status_snapshot_frequency="1 min"
+    export NIFI__nifiproperties__nifi_status_repository_questdb_persist_node_days="14"
+    export NIFI__nifiproperties__nifi_status_repository_questdb_persist_component_days="3"
+    export NIFI__nifiproperties__nifi_status_repository_questdb_persist_location="./status_repository"
+    export NIFI__nifiproperties__nifi_remote_input_host="${HOSTNAME}"
+    export NIFI__nifiproperties__nifi_remote_input_secure="false"
+    export NIFI__nifiproperties__nifi_remote_input_socket_port="10000"
+    export NIFI__nifiproperties__nifi_remote_input_http_enabled="true"
+    export NIFI__nifiproperties__nifi_remote_input_http_transaction_ttl="30 sec"
+    export NIFI__nifiproperties__nifi_remote_contents_cache_expiration="30 secs"
+    export NIFI__nifiproperties__nifi_web_http_network_interface_default=""
+    export NIFI__nifiproperties__nifi_web_https_host=""
+    export NIFI__nifiproperties__nifi_web_https_port=""
+    export NIFI__nifiproperties__nifi_web_https_network_interface_default=""
+    export NIFI__nifiproperties__nifi_web_jetty_working_directory="./work/jetty"
+    export NIFI__nifiproperties__nifi_web_jetty_threads="200"
+    export NIFI__nifiproperties__nifi_web_max_header_size="16 KB"
+    export NIFI__nifiproperties__nifi_web_proxy_context_path=""
+    export NIFI__nifiproperties__nifi_web_proxy_host=""
+    export NIFI__nifiproperties__nifi_web_max_content_size=""
+    export NIFI__nifiproperties__nifi_web_max_requests_per_second="30000"
+    export NIFI__nifiproperties__nifi_web_max_access_token_requests_per_second="25"
+    export NIFI__nifiproperties__nifi_web_request_timeout="60 secs"
+    export NIFI__nifiproperties__nifi_web_request_ip_whitelist=""
+    export NIFI__nifiproperties__nifi_web_should_send_server_version="true"
+    export NIFI__nifiproperties__nifi_web_request_log_format="%{client}a - %u %t \"%r\" %s %O \"%{Referer}i\" \"%{User-Agent}i\""
+    export NIFI__nifiproperties__nifi_web_https_ciphersuites_include=""
+    export NIFI__nifiproperties__nifi_web_https_ciphersuites_exclude=""
+    export NIFI__nifiproperties__nifi_sensitive_props_key_protected=""
+    export NIFI__nifiproperties__nifi_sensitive_props_algorithm="NIFI_PBKDF2_AES_GCM_256"
+    export NIFI__nifiproperties__nifi_sensitive_props_additional_keys=""
+    export NIFI__nifiproperties__nifi_security_autoreload_enabled="false"
+    export NIFI__nifiproperties__nifi_security_autoreload_interval="10 secs"
+    export NIFI__nifiproperties__nifi_security_keystore=""
+    export NIFI__nifiproperties__nifi_security_keystoretype=""
+    export NIFI__nifiproperties__nifi_security_keystorepasswd=""
+    export NIFI__nifiproperties__nifi_security_keypasswd=""
+    export NIFI__nifiproperties__nifi_security_truststore=""
+    export NIFI__nifiproperties__nifi_security_truststoretype=""
+    export NIFI__nifiproperties__nifi_security_truststorepasswd=""
+    export NIFI__nifiproperties__nifi_security_user_authorizer="single-user-authorizer"
+    export NIFI__nifiproperties__nifi_security_allow_anonymous_authentication="false"
+    export NIFI__nifiproperties__nifi_security_user_login_identity_provider=""
+    export NIFI__nifiproperties__nifi_security_user_jws_key_rotation_period="PT1H"
+    export NIFI__nifiproperties__nifi_security_ocsp_responder_url=""
+    export NIFI__nifiproperties__nifi_security_ocsp_responder_certificate=""
+    export NIFI__nifiproperties__nifi_security_user_oidc_discovery_url=""
+    export NIFI__nifiproperties__nifi_security_user_oidc_connect_timeout="5 secs"
+    export NIFI__nifiproperties__nifi_security_user_oidc_read_timeout="5 secs"
+    export NIFI__nifiproperties__nifi_security_user_oidc_client_id=""
+    export NIFI__nifiproperties__nifi_security_user_oidc_client_secret=""
+    export NIFI__nifiproperties__nifi_security_user_oidc_preferred_jwsalgorithm=""
+    export NIFI__nifiproperties__nifi_security_user_oidc_additional_scopes=""
+    export NIFI__nifiproperties__nifi_security_user_oidc_claim_identifying_user=""
+    export NIFI__nifiproperties__nifi_security_user_oidc_fallback_claims_identifying_user=""
+    export NIFI__nifiproperties__nifi_security_user_oidc_truststore_strategy="JDK"
+    export NIFI__nifiproperties__nifi_security_user_knox_url=""
+    export NIFI__nifiproperties__nifi_security_user_knox_publickey=""
+    export NIFI__nifiproperties__nifi_security_user_knox_cookiename="hadoop-jwt"
+    export NIFI__nifiproperties__nifi_security_user_knox_audiences=""
+    export NIFI__nifiproperties__nifi_security_user_saml_idp_metadata_url=""
+    export NIFI__nifiproperties__nifi_security_user_saml_sp_entity_id=""
+    export NIFI__nifiproperties__nifi_security_user_saml_identity_attribute_name=""
+    export NIFI__nifiproperties__nifi_security_user_saml_group_attribute_name=""
+    export NIFI__nifiproperties__nifi_security_user_saml_metadata_signing_enabled="false"
+    export NIFI__nifiproperties__nifi_security_user_saml_request_signing_enabled="false"
+    export NIFI__nifiproperties__nifi_security_user_saml_signature_algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+    export NIFI__nifiproperties__nifi_security_user_saml_signature_digest_algorithm="http://www.w3.org/2001/04/xmlenc#sha256"
+    export NIFI__nifiproperties__nifi_security_user_saml_message_logging_enabled="false"
+    export NIFI__nifiproperties__nifi_security_user_saml_authentication_expiration="12 hours"
+    export NIFI__nifiproperties__nifi_security_user_saml_single_logout_enabled="false"
+    export NIFI__nifiproperties__nifi_security_user_saml_http_client_truststore_strategy="JDK"
+    export NIFI__nifiproperties__nifi_security_user_saml_http_client_connect_timeout="30 secs"
+    export NIFI__nifiproperties__nifi_security_user_saml_http_client_read_timeout="30 secs"
+    export NIFI__nifiproperties__nifi_listener_bootstrap_port="0"
+    export NIFI__nifiproperties__nifi_cluster_protocol_heartbeat_interval="5 sec"
+    export NIFI__nifiproperties__nifi_cluster_protocol_heartbeat_missable_max="8"
+    export NIFI__nifiproperties__nifi_cluster_protocol_is_secure="false"
+    export NIFI__nifiproperties__nifi_cluster_node_address="${HOSTNAME}.nifi-hs.default.svc.cluster.local"
+    export NIFI__nifiproperties__nifi_cluster_node_event_history_size="25"
+    export NIFI__nifiproperties__nifi_cluster_node_connection_timeout="5 sec"
+    export NIFI__nifiproperties__nifi_cluster_node_read_timeout="5 sec"
+    export NIFI__nifiproperties__nifi_cluster_node_max_concurrent_requests="100"
+    export NIFI__nifiproperties__nifi_cluster_firewall_file=""
+    export NIFI__nifiproperties__nifi_cluster_flow_election_max_wait_time="20 sec"
+    export NIFI__nifiproperties__nifi_cluster_flow_election_max_candidates="1"
+    export NIFI__nifiproperties__nifi_cluster_load_balance_host=""
+    export NIFI__nifiproperties__nifi_cluster_load_balance_port="6342"
+    export NIFI__nifiproperties__nifi_cluster_load_balance_connections_per_node="1"
+    export NIFI__nifiproperties__nifi_cluster_load_balance_max_thread_count="8"
+    export NIFI__nifiproperties__nifi_cluster_load_balance_comms_timeout="30 sec"
+    export NIFI__nifiproperties__nifi_zookeeper_connect_timeout="10 secs"
+    export NIFI__nifiproperties__nifi_zookeeper_session_timeout="10 secs"
+    export NIFI__nifiproperties__nifi_zookeeper_root_node="/nifi"
+    export NIFI__nifiproperties__nifi_zookeeper_client_secure="false"
+    export NIFI__nifiproperties__nifi_zookeeper_security_keystore=""
+    export NIFI__nifiproperties__nifi_zookeeper_security_keystoretype=""
+    export NIFI__nifiproperties__nifi_zookeeper_security_keystorepasswd=""
+    export NIFI__nifiproperties__nifi_zookeeper_security_truststore=""
+    export NIFI__nifiproperties__nifi_zookeeper_security_truststoretype=""
+    export NIFI__nifiproperties__nifi_zookeeper_security_truststorepasswd=""
+    export NIFI__nifiproperties__nifi_zookeeper_jute_maxbuffer=""
+    export NIFI__nifiproperties__nifi_zookeeper_auth_type=""
+    export NIFI__nifiproperties__nifi_zookeeper_kerberos_removehostfromprincipal=""
+    export NIFI__nifiproperties__nifi_zookeeper_kerberos_removerealmfromprincipal=""
+    export NIFI__nifiproperties__nifi_kerberos_krb5_file=""
+    export NIFI__nifiproperties__nifi_kerberos_service_principal=""
+    export NIFI__nifiproperties__nifi_kerberos_service_keytab_location=""
+    export NIFI__nifiproperties__nifi_kerberos_spnego_principal=""
+    export NIFI__nifiproperties__nifi_kerberos_spnego_keytab_location=""
+    export NIFI__nifiproperties__nifi_kerberos_spnego_authentication_expiration="12 hours"
+    export NIFI__nifiproperties__nifi_variable_registry_properties=""
+    export NIFI__nifiproperties__nifi_analytics_predict_interval="3 mins"
+    export NIFI__nifiproperties__nifi_analytics_query_interval="5 mins"
+    export NIFI__nifiproperties__nifi_analytics_connection_model_implementation="org.apache.nifi.controller.status.analytics.models.OrdinaryLeastSquares"
+    export NIFI__nifiproperties__nifi_analytics_connection_model_score_name="rSquared"
+    export NIFI__nifiproperties__nifi_analytics_connection_model_score_threshold=".90"
+    export NIFI__nifiproperties__nifi_monitor_long_running_task_schedule=""
+    export NIFI__nifiproperties__nifi_monitor_long_running_task_threshold=""
+    export NIFI__nifiproperties__nifi_diagnostics_on_shutdown_enabled="false"
+    export NIFI__nifiproperties__nifi_diagnostics_on_shutdown_verbose="false"
+    export NIFI__nifiproperties__nifi_diagnostics_on_shutdown_directory="./diagnostics"
+    export NIFI__nifiproperties__nifi_diagnostics_on_shutdown_max_filecount="10"
+    export NIFI__nifiproperties__nifi_diagnostics_on_shutdown_max_directory_size="10 MB"
+    export NIFI__nifiproperties__nifi_security_user_saml_want_assertions_signed="true"
+    export NIFI__nifiproperties__nifi_cluster_node_protocol_port=8082
+    export NIFI__nifiproperties__nifi_cluster_node_protocol_max_threads=20
 	`
 
 	nifiServers := ``
@@ -661,7 +659,7 @@ func (r *NifiReconciler) stateFulSetForNifi(nifi *bigdatav1alpha1.Nifi) (client.
 
 	fastdisks := "fast-disks"
 
-	dep := &appsv1.StatefulSet{
+	sts := &appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      nifi.Name,
 			Namespace: nifi.Namespace,
@@ -709,18 +707,6 @@ func (r *NifiReconciler) stateFulSetForNifi(nifi *bigdatav1alpha1.Nifi) (client.
 						},
 						Env: []corev1.EnvVar{
 							{
-								Name:  "SINGLE_USER_CREDENTIALS_USERNAME",
-								Value: "admin",
-							},
-							{
-								Name:  "SINGLE_USER_CREDENTIALS_PASSWORD",
-								Value: "admin123456789",
-							},
-							{
-								Name:  "NIFI_SENSITIVE_PROPS_KEY",
-								Value: "randomstring12charsmin",
-							},
-							{
 								Name: "HOSTNAME",
 								ValueFrom: &corev1.EnvVarSource{
 									FieldRef: &corev1.ObjectFieldSelector{
@@ -729,52 +715,12 @@ func (r *NifiReconciler) stateFulSetForNifi(nifi *bigdatav1alpha1.Nifi) (client.
 								},
 							},
 							{
-								Name:  "NIFI_WEB_HTTP_HOST",
-								Value: "$(HOSTNAME).nifi-hs.default.svc.cluster.local",
-							},
-							{
-								Name:  "NIFI_WEB_HTTP_PORT",
-								Value: "8080",
-							},
-							{
-								Name:  "NIFI_CLUSTER_IS_NODE",
-								Value: "true",
-							},
-							{
-								Name:  "NIFI_CLUSTER_NODE_PROTOCOL_PORT",
-								Value: "8082",
-							},
-							{
-								Name:  "NIFI_CLUSTER_NODE_PROTOCOL_MAX_THREADS",
-								Value: "20",
-							},
-							{
-								Name:  "NIFI_CLUSTER_ADDRESS",
-								Value: "$(HOSTNAME).nifi-hs.default.svc.cluster.local",
-							},
-							{
-								Name:  "NIFI_ANALYTICS_PREDICT_ENABLED",
-								Value: "true",
-							},
-							{
-								Name:  "NIFI_ELECTION_MAX_CANDIDATES",
-								Value: "1",
-							},
-							{
 								Name:  "NIFI_ZK_CONNECT_STRING",
 								Value: "zk-0.zk-hs.default.svc.cluster.local:2181,zk-1.zk-hs.default.svc.cluster.local:2181,zk-2.zk-hs.default.svc.cluster.local:2181",
 							},
 							{
 								Name:  "ZK_MONITOR_PORT",
 								Value: "2888",
-							},
-							{
-								Name:  "IS_CLUSTER_NODE",
-								Value: "yes",
-							},
-							{
-								Name:  "NIFI_ELECTION_MAX_WAIT",
-								Value: "20 sec",
 							},
 							{
 								Name:  "NIFI_JVM_HEAP_INIT",
@@ -830,10 +776,10 @@ func (r *NifiReconciler) stateFulSetForNifi(nifi *bigdatav1alpha1.Nifi) (client.
 
 	// Set the ownerRef for the Deployment
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/owners-dependents/
-	if err := ctrl.SetControllerReference(nifi, dep, r.Scheme); err != nil {
+	if err := ctrl.SetControllerReference(nifi, sts, r.Scheme); err != nil {
 		return nil, err
 	}
-	return dep, nil
+	return sts, nil
 }
 
 // labelsForNifi returns the labels for selecting the resources
@@ -860,7 +806,7 @@ func imageForNifi() (string, error) {
 	var imageEnvVar = "NIFI_IMAGE"
 	image, found := os.LookupEnv(imageEnvVar)
 	if !found {
-		return "", fmt.Errorf("Unable to find %s environment variable with the image", imageEnvVar)
+		return "", fmt.Errorf("unable to find %s environment variable with the image", imageEnvVar)
 	}
 
 	//image := "kubernetesbigdataeg/nifi-alpine:1.16.1-1"

@@ -68,40 +68,14 @@ spec:
         - containerPort: 9092
           name: exporter-port
         env:
-          - name: SINGLE_USER_CREDENTIALS_USERNAME
-            value: "admin"
-          - name: SINGLE_USER_CREDENTIALS_PASSWORD
-            value: "admin123456789"
-          - name: NIFI_SENSITIVE_PROPS_KEY
-            value: "randomstring12charsmin"
           - name: HOSTNAME
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-          - name: NIFI_WEB_HTTP_HOST
-            value: $(HOSTNAME).nifi-hs.default.svc.cluster.local
-          - name: NIFI_WEB_HTTP_PORT
-            value: "8080"
-          - name: NIFI_CLUSTER_IS_NODE
-            value: "true"
-          - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
-            value: "8082"
-          - name: NIFI_CLUSTER_NODE_PROTOCOL_MAX_THREADS
-            value: "20"
-          - name: NIFI_CLUSTER_ADDRESS
-            value: $(HOSTNAME).nifi-hs.default.svc.cluster.local
-          - name: NIFI_ANALYTICS_PREDICT_ENABLED
-            value: "true"
-          - name: NIFI_ELECTION_MAX_CANDIDATES
-            value: "1"
           - name: NIFI_ZK_CONNECT_STRING
             value: "zk-0.zk-hs.default.svc.cluster.local:2181,zk-1.zk-hs.default.svc.cluster.local:2181,zk-2.zk-hs.default.svc.cluster.local:2181"
           - name: ZK_MONITOR_PORT
             value: "2888"
-          - name: IS_CLUSTER_NODE
-            value: "yes"
-          - name: NIFI_ELECTION_MAX_WAIT
-            value: "20 sec"
           - name: NIFI_JVM_HEAP_INIT
             value: "3g"
           - name: NIFI_JVM_HEAP_MAX
