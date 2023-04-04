@@ -110,7 +110,7 @@ case ${AUTH} in
 esac
 
 source /etc/environments/nifi.env
-/opt/nifi/propgen -label NIFI -render nifiproperties -file /opt/nifi/nifi-current/conf/nifi.properties2
+/opt/nifi/propgen -label NIFI -render nifiproperties -file /opt/nifi/nifi-current/conf/nifi.properties
 
 # Continuously provide logs so that 'docker logs' can produce them
 "${NIFI_HOME}/bin/nifi.sh" run &

@@ -20,7 +20,7 @@ COPY scripts ${NIFI_BASE_DIR}/scripts/
 RUN chmod -R +x ${NIFI_BASE_DIR}/scripts/*.sh
 RUN apk update \
     && apk add bash \
-    && wget -O  ${NIFI_BASE_DIR}/propgen  https://github.com/javiroman/propgen/releases/download/release-v0.0.2/propgen \
+    && wget -O  ${NIFI_BASE_DIR}/propgen https://github.com/kubernetesbigdataeg/propgen/releases/latest/download/propgen \
     && chmod 777 ${NIFI_BASE_DIR}/propgen
 
 # Setup NiFi user and create necessary directories
