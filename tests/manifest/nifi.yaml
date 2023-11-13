@@ -11,13 +11,13 @@ spec:
     targetPort: 8081
     name: nifi-listen-http
   - protocol: TCP
-    port: 2881
-    targetPort: 2881
-    name: nifi-site-protocol
+    port: 10443
+    targetPort: 10443
+    name: site-protocol
   - protocol: TCP
-    port: 2882
-    targetPort: 2882
-    name: nifi-node-protocol
+    port: 11443
+    targetPort: 11443
+    name: node-protocol
   clusterIP: None
   selector:
     app: nifi
@@ -56,15 +56,19 @@ spec:
       restartPolicy: Always
       containers:
       - name: nifi
-        image: kubernetesbigdataeg/nifi:1.16.1-1
+        image: kubernetesbigdataeg/nifi:1.23.2-1
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 8082
-          name: cluster
         - containerPort: 8080
+          name: http        
         - containerPort: 8081
+          name: listen-http
         - containerPort: 8443
-        - containerPort: 2882
+          name: https
+        - containerPort: 10443
+          name: site-protocol
+        - containerPort: 11443
+          name: node-protocol
         - containerPort: 9092
           name: exporter-port
         env:
@@ -73,7 +77,7 @@ spec:
               fieldRef:
                 fieldPath: metadata.name
           - name: NIFI_ZK_CONNECT_STRING
-            value: "zk-0.zk-hs.default.svc.cluster.local:2181,zk-1.zk-hs.default.svc.cluster.local:2181,zk-2.zk-hs.default.svc.cluster.local:2181"
+            value: "zookeeper-0.zookeeper-hs.default.svc.cluster.local:2181,zookeeper-1.zookeeper-hs.default.svc.cluster.local:2181,zookeeper-2.zookeeper-hs.default.svc.cluster.local:2181"
           - name: ZK_MONITOR_PORT
             value: "2888"
           - name: NIFI_JVM_HEAP_INIT
@@ -94,7 +98,7 @@ spec:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: fast-disks
+      storageClassName: longhorn
       resources:
         requests:
           storage: 500Mi
@@ -110,7 +114,7 @@ data:
     export NIFI__nifiproperties__nifi_web_http_port="8080"
     export NIFI__nifiproperties__nifi_cluster_is_node="true"
     export NIFI__nifiproperties__nifi_analytics_predict_enabled="true"
-    export NIFI__nifiproperties__nifi_zookeeper_connect_string="zk-0.zk-hs.default.svc.cluster.local:2181,zk-1.zk-hs.default.svc.cluster.local:2181,zk-2.zk-hs.default.svc.cluster.local:2181"
+    export NIFI__nifiproperties__nifi_zookeeper_connect_string="zookeeper-0.zookeeper-hs.default.svc.cluster.local:2181,zookeeper-1.zookeeper-hs.default.svc.cluster.local:2181,zookeeper-2.zookeeper-hs.default.svc.cluster.local:2181"
     export NIFI__nifiproperties__nifi_flow_configuration_file="./conf/flow.xml.gz"
     export NIFI__nifiproperties__nifi_flow_configuration_json_file="./conf/flow.json.gz"
     export NIFI__nifiproperties__nifi_flow_configuration_archive_enabled="true"
@@ -305,5 +309,5 @@ data:
     export NIFI__nifiproperties__nifi_diagnostics_on_shutdown_max_filecount="10"
     export NIFI__nifiproperties__nifi_diagnostics_on_shutdown_max_directory_size="10 MB"
     export NIFI__nifiproperties__nifi_security_user_saml_want_assertions_signed="true"
-    export NIFI__nifiproperties__nifi_cluster_node_protocol_port=8082
+    export NIFI__nifiproperties__nifi_cluster_node_protocol_port=11443
     export NIFI__nifiproperties__nifi_cluster_node_protocol_max_threads=20
