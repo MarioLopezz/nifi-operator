@@ -82,6 +82,13 @@ prop_replace 'nifi.analytics.connection.model.implementation'   "${NIFI_ANALYTIC
 prop_replace 'nifi.analytics.connection.model.score.name'       "${NIFI_ANALYTICS_MODEL_SCORE_NAME:-rSquared}"
 prop_replace 'nifi.analytics.connection.model.score.threshold'  "${NIFI_ANALYTICS_MODEL_SCORE_THRESHOLD:-.90}"
 
+# Add NAR provider properties
+# nifi-registry NAR provider
+if [ -n "${NIFI_NAR_LIBRARY_PROVIDER_NIFI_REGISTRY_URL}" ]; then
+    prop_add_or_replace 'nifi.nar.library.provider.nifi-registry.implementation' 'org.apache.nifi.registry.extension.NiFiRegistryExternalResourceProvider'
+    prop_add_or_replace 'nifi.nar.library.provider.nifi-registry.url' "${NIFI_NAR_LIBRARY_PROVIDER_NIFI_REGISTRY_URL}"
+fi
+
 if [ -n "${NIFI_SENSITIVE_PROPS_KEY}" ]; then
     prop_replace 'nifi.sensitive.props.key' "${NIFI_SENSITIVE_PROPS_KEY}"
 fi
@@ -90,7 +97,6 @@ if [ -n "${SINGLE_USER_CREDENTIALS_USERNAME}" ] && [ -n "${SINGLE_USER_CREDENTIA
     ${NIFI_HOME}/bin/nifi.sh set-single-user-credentials "${SINGLE_USER_CREDENTIALS_USERNAME}" "${SINGLE_USER_CREDENTIALS_PASSWORD}"
 fi
 
-ls
 . "${scripts_dir}/update_cluster_state_management.sh"
 
 # Check if we are secured or unsecured
@@ -107,7 +113,7 @@ case ${AUTH} in
         . "${scripts_dir}/secure.sh"
         . "${scripts_dir}/update_login_providers.sh"
         ;;
-esac
+    esac
 
 source /etc/environments/nifi.env
 /opt/nifi/propgen -label NIFI -render nifiproperties -file /opt/nifi/nifi-current/conf/nifi.properties
