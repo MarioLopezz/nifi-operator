@@ -1,11 +1,9 @@
 apiVersion: bigdata.kubernetesbigdataeg.org/v1alpha1
 kind: Nifi
 metadata:
-  name: nifi-sample
-spec:
-  # TODO(user): edit the following value to ensure the number 
-  # of Pods/Instances your Operand must have on cluster        
+  name: nifi
+spec:  
   size: 3
-  zookeeper: "default/zk"
+  zookeeper: "default/zookeeper"
 
   

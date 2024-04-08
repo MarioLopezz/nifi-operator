@@ -121,7 +121,7 @@ source /etc/environments/nifi.env
 # Continuously provide logs so that 'docker logs' can produce them
 "${NIFI_HOME}/bin/nifi.sh" run &
 nifi_pid="$!"
-tail -F --pid=${nifi_pid} "${NIFI_HOME}/logs/nifi-app.log" &
+tail -F "${NIFI_HOME}/logs/nifi-app.log" &
 
 trap 'echo Received trapped signal, beginning shutdown...;./bin/nifi.sh stop;exit 0;' TERM HUP INT;
 trap ":" EXIT

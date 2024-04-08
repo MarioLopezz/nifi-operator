@@ -47,7 +47,7 @@ spec:
     matchLabels:
       app: nifi
   serviceName: nifi-hs
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:
@@ -57,7 +57,13 @@ spec:
       containers:
       - name: nifi
         image: kubernetesbigdataeg/nifi:1.23.2-1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "8Gi"  
+          requests:
+            cpu: "1"  
+            memory: "8Gi"
         ports:
         - containerPort: 8080
           name: http        
@@ -77,31 +83,50 @@ spec:
               fieldRef:
                 fieldPath: metadata.name
           - name: NIFI_ZK_CONNECT_STRING
-            value: "zookeeper-0.zookeeper-hs.default.svc.cluster.local:2181,zookeeper-1.zookeeper-hs.default.svc.cluster.local:2181,zookeeper-2.zookeeper-hs.default.svc.cluster.local:2181"
+            value: "zookeeper-0.zookeeper-hs.default.svc.cluster.local:2181"
           - name: ZK_MONITOR_PORT
             value: "2888"
           - name: NIFI_JVM_HEAP_INIT
-            value: "3g"
+            value: "8g"
           - name: NIFI_JVM_HEAP_MAX
-            value: "4g"
+            value: "8g"
         volumeMounts:
           - name: data
-            mountPath: /opt/nifi/nifi-current/data
-          - mountPath: /etc/environments
-            name: nifi-config-volume
+            mountPath: /opt/nifi/nifi-current/conf/persistent
+            subPath: conf
+          - name: data
+            mountPath: /opt/nifi/nifi-current/flowfile_repository
+            subPath: flowfile_repository
+          - name: data
+            mountPath: /opt/nifi/nifi-current/content_repository
+            subPath: content_repository
+          - name: data
+            mountPath: /opt/nifi/nifi-current/database_repository
+            subPath: database_repository
+          - name: data
+            mountPath: /opt/nifi/nifi-current/provenance_repository
+            subPath: provenance_repository
+          - name: data
+            mountPath: /opt/nifi/nifi-current/state
+            subPath: state
+          - name: nifi-config-volume
+            mountPath: /etc/environments          
       volumes:
       - name: nifi-config-volume
         configMap:
           name: nifi-config
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
   volumeClaimTemplates:
   - metadata:
       name: data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: longhorn
       resources:
         requests:
-          storage: 500Mi
+          storage: 10Gi
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -114,9 +139,9 @@ data:
     export NIFI__nifiproperties__nifi_web_http_port="8080"
     export NIFI__nifiproperties__nifi_cluster_is_node="true"
     export NIFI__nifiproperties__nifi_analytics_predict_enabled="true"
-    export NIFI__nifiproperties__nifi_zookeeper_connect_string="zookeeper-0.zookeeper-hs.default.svc.cluster.local:2181,zookeeper-1.zookeeper-hs.default.svc.cluster.local:2181,zookeeper-2.zookeeper-hs.default.svc.cluster.local:2181"
-    export NIFI__nifiproperties__nifi_flow_configuration_file="./conf/flow.xml.gz"
-    export NIFI__nifiproperties__nifi_flow_configuration_json_file="./conf/flow.json.gz"
+    export NIFI__nifiproperties__nifi_zookeeper_connect_string="${NIFI_ZK_CONNECT_STRING}"
+    export NIFI__nifiproperties__nifi_flow_configuration_file="./conf/persistent/flow.xml.gz"
+    export NIFI__nifiproperties__nifi_flow_configuration_json_file="./conf/persistent/flow.json.gz"
     export NIFI__nifiproperties__nifi_flow_configuration_archive_enabled="true"
     export NIFI__nifiproperties__nifi_flow_configuration_archive_dir="./conf/archive/"
     export NIFI__nifiproperties__nifi_flow_configuration_archive_max_time="30 days"
@@ -131,7 +156,7 @@ data:
     export NIFI__nifiproperties__nifi_queue_backpressure_size="1 GB"
     export NIFI__nifiproperties__nifi_authorizer_configuration_file="./conf/authorizers.xml"
     export NIFI__nifiproperties__nifi_login_identity_provider_configuration_file="./conf/login-identity-providers.xml"
-    export NIFI__nifiproperties__nifi_templates_directory="./conf/templates"
+    export NIFI__nifiproperties__nifi_templates_directory="./conf/persistent/templates"
     export NIFI__nifiproperties__nifi_ui_banner_text=""
     export NIFI__nifiproperties__nifi_ui_autorefresh_interval="30 sec"
     export NIFI__nifiproperties__nifi_nar_library_directory="./lib"
@@ -169,7 +194,7 @@ data:
     export NIFI__nifiproperties__nifi_provenance_repository_implementation="org.apache.nifi.provenance.WriteAheadProvenanceRepository"
     export NIFI__nifiproperties__nifi_provenance_repository_directory_default="./provenance_repository"
     export NIFI__nifiproperties__nifi_provenance_repository_max_storage_time="30 days"
-    export NIFI__nifiproperties__nifi_provenance_repository_max_storage_size="10 GB"
+    export NIFI__nifiproperties__nifi_provenance_repository_max_storage_size="4 GB"
     export NIFI__nifiproperties__nifi_provenance_repository_rollover_time="10 mins"
     export NIFI__nifiproperties__nifi_provenance_repository_rollover_size="100 MB"
     export NIFI__nifiproperties__nifi_provenance_repository_query_threads="2"
