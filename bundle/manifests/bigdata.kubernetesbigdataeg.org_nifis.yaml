@@ -45,6 +45,8 @@ spec:
                 maximum: 3
                 minimum: 1
                 type: integer
+              zookeeper:
+                type: string
             type: object
           status:
             description: NifiStatus defines the observed state of Nifi

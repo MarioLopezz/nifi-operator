@@ -19,18 +19,16 @@ COPY scripts ${NIFI_BASE_DIR}/scripts/
 RUN chmod -R +x ${NIFI_BASE_DIR}/scripts/*.sh
 
 RUN apk update \
-    && apk add bash \
+    && apk add --no-cache jq xmlstarlet procps unzip curl bash \
     && wget -O  ${NIFI_BASE_DIR}/propgen https://github.com/kubernetesbigdataeg/propgen/releases/latest/download/propgen \
-    && chmod 777 ${NIFI_BASE_DIR}/propgen
+    && chmod 777 ${NIFI_BASE_DIR}/propgen \
+    && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
 # Setup NiFi user and create necessary directories
 RUN addgroup -g ${GID} nifi || addgroup `getent group ${GID} | cut -d: -f1` nifi \
     && adduser -D -s /bin/bash -u ${UID} -G nifi -h /home/nifi nifi \
     && mkdir -p ${NIFI_BASE_DIR} \
-    && chown -R nifi:nifi ${NIFI_BASE_DIR} \
-    && apk update \
-    && apk add --no-cache jq xmlstarlet procps unzip curl \
-    && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+    && chown -R nifi:nifi ${NIFI_BASE_DIR}
 
 USER nifi
 
