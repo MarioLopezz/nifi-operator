@@ -201,7 +201,7 @@ spec:
                 env:
                 - name: NIFI_IMAGE
                   value: kubernetesbigdataeg/nifi-alpine:1.16.1-1
-                image: kubernetesbigdataeg/nifi-operator:0.0.1
+                image: docker.io/kubernetesbigdataeg/nifi-operator:0.0.1
                 imagePullPolicy: Always
                 livenessProbe:
                   httpGet:
