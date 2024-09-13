@@ -9,7 +9,7 @@ plugins:
       kind: Nifi
       options:
         containerCommand: nifi,-m=64,modern,-v
-        image: kubernetesbigdataeg/nifi-alpine:1.16.1
+        image: docker.io/kubernetesbigdataeg/nifi-alpine:1.16.1
         runAsUser: "1000"
       version: v1alpha1
   manifests.sdk.operatorframework.io/v2: {}

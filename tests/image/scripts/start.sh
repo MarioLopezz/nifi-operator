@@ -63,7 +63,7 @@ else
     fi
 fi
 
-prop_replace 'nifi.variable.registry.properties'    "${NIFI_VARIABLE_REGISTRY_PROPERTIES:-}"
+prop_replace 'nifi.variable.registry.properties'            "${NIFI_VARIABLE_REGISTRY_PROPERTIES:-}"
 prop_replace 'nifi.cluster.is.node'                         "${NIFI_CLUSTER_IS_NODE:-false}"
 prop_replace 'nifi.cluster.node.address'                    "${NIFI_CLUSTER_ADDRESS:-$HOSTNAME}"
 prop_replace 'nifi.cluster.node.protocol.port'              "${NIFI_CLUSTER_NODE_PROTOCOL_PORT:-}"
@@ -73,6 +73,11 @@ prop_replace 'nifi.zookeeper.root.node'                     "${NIFI_ZK_ROOT_NODE
 prop_replace 'nifi.cluster.flow.election.max.wait.time'     "${NIFI_ELECTION_MAX_WAIT:-5 mins}"
 prop_replace 'nifi.cluster.flow.election.max.candidates'    "${NIFI_ELECTION_MAX_CANDIDATES:-}"
 prop_replace 'nifi.web.proxy.context.path'                  "${NIFI_WEB_PROXY_CONTEXT_PATH:-}"
+
+prop_replace 'nifi.flow.configuration.file'                  "${NIFI_FLOW_CONFIGURATION_FILE:-./conf/flow.xml.gz}"
+prop_replace 'nifi.flow.configuration.json.file'             "${NIFI_FLOW_CONFIGURATION_JSON_FILE:-./conf/flow.json.gz}"
+prop_replace 'nifi.templates.directory'                      "${NIFI_TEMPLATES_DIRECTORY:-./conf/templates}"
+prop_replace 'nifi.provenance.repository.max.storage.size'   "${NIFI_PROVENANCE_REPOSITORY_MAX_STORAGE_SIZE:-10 GB}"
 
 # Set analytics properties
 prop_replace 'nifi.analytics.predict.enabled'                   "${NIFI_ANALYTICS_PREDICT_ENABLED:-false}"
@@ -114,9 +119,6 @@ case ${AUTH} in
         . "${scripts_dir}/update_login_providers.sh"
         ;;
     esac
-
-source /etc/environments/nifi.env
-/opt/nifi/propgen -label NIFI -render nifiproperties -file /opt/nifi/nifi-current/conf/nifi.properties
 
 # Continuously provide logs so that 'docker logs' can produce them
 "${NIFI_HOME}/bin/nifi.sh" run &
