@@ -66,7 +66,8 @@ RUN mkdir ${NIFI_HOME}/external_lib
 RUN cd ${NIFI_HOME}/external_lib \ 
     && curl -fSL https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.3/hive-jdbc-3.1.3.jar -o hive-jdbc-3.1.3.jar \
     && curl -fSL https://repo1.maven.org/maven2/org/apache/kudu/kudu-client/1.17.0/kudu-client-1.17.0.jar -o kudu-client-1.17.0.jar \
-    && curl https://repo1.maven.org/maven2/com/stumbleupon/async/1.4.1/async-1.4.1.jar -o async-1.4.1.jar
+    && curl -fSL https://repo1.maven.org/maven2/com/stumbleupon/async/1.4.1/async-1.4.1.jar -o async-1.4.1.jar \
+    && curl -fSL https://repo1.maven.org/maven2/org/apache/parquet/parquet-hadoop/1.14.3/parquet-hadoop-1.14.3.jar -o parquet-hadoop-1.14.3.jar
 
 # Clear nifi-env.sh in favour of configuring all environment variables in the Dockerfile
 RUN echo "#!/bin/sh\n" > $NIFI_HOME/bin/nifi-env.sh

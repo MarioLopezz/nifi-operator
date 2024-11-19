@@ -27,17 +27,12 @@ kind: Service
 metadata:
   name: nifi-svc
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: nifi
   ports:
-  - port: 8080
-    targetPort: 8080
-    nodePort: 30000
-    name: http
   - port: 8443
     targetPort: 8443
-    nodePort: 30001
     name: https
 ---
 apiVersion: apps/v1
@@ -61,7 +56,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: nifi
-        image: kubernetesbigdataeg/nifi:1.23.2-1
+        image: kubernetesbigdataeg/nifi:1.27.0-2
         imagePullPolicy: IfNotPresent
         resources:
           limits:
@@ -112,6 +107,10 @@ spec:
             value: "zookeeper-0.zookeeper-hs.default.svc.cluster.local:2181"
           - name: ZK_MONITOR_PORT
             value: "2888"
+          - name: NIFI_JVM_HEAP_INIT
+            value: "8g"
+          - name: NIFI_JVM_HEAP_MAX
+            value: "8g"
           - name: NIFI_SECURITY_USER_LOGIN_IDENTITY_PROVIDER
             value: "single-user-provider"     
           - name: NIFI_CLUSTER_ADDRESS
@@ -130,6 +129,8 @@ spec:
             value: "./conf/persistent/flow.json.gz"
           - name: NIFI_TEMPLATES_DIRECTORY
             value: "./conf/persistent/templates"
+          - name: NIFI_PROVENANCE_REPOSITORY_MAX_STORAGE_SIZE
+            value: "4 GB"
           - name: NIFI_ANALYTICS_PREDICT_ENABLED
             value: "true"
           - name: NIFI_ELECTION_MAX_CANDIDATES
